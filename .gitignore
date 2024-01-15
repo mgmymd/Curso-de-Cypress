@@ -1,0 +1,16 @@
+# Logs
+logs
+*.log
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Output of 'npm run build'
+dist/
+build/
+
+# Cypress artifacts
+cypress/screenshots/
+cypress/videos/
+cypress/results/
