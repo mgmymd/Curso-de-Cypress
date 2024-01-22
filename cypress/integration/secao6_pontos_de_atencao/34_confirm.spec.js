@@ -53,8 +53,29 @@ describe('Pontos de atenção II', () =>{
         cy.get('#confirm').click()
     })
     it('Prompt', () => {
-/* Também é da família do alert e parecido com ele. 
-*/
+/* Também é da família do alert e parecido com ele. O Prompt é a caixa de mensagem que parece o alert
+ * e tem uma mensagem, uma caixa de texto para preenchimento e os botões de Ok e cancelar;
+ * Depois de inserir a mensagem podemos enviar ou cancelar o envio.
+ * O cenário de teste é clicar no prompt, inserir um número, confirmar e obter a carinha feliz; 
+ * Vamos usar o cypress para mockar o método prompt do window, usar uma promise e fazer retornar
+ *  o objeto window da página, que é o objeto que está gerenciando toda a página. Na promise, 
+ * then, vamos passar o nome do objeto e o parâmetro que queremos abaixo há o stub para
+ *  o método prompt. O stub cria um método próximo do comportamento real, mas para evitar
+ * o retorno undefinied devemos passar um comportamento para que ele retorne, temos que usar
+ * o .returns(42) para indicar que queremos que ele retorne o 42 nesse método */
+
+        cy.window().then(win => {
+            cy.stub(win, 'prompt').returns("42");
+        });
+
+/* Depois de ter utilizado a promise e o stub é possível realizar as confirmações abaixo*/
+        cy.on("window:confirm", msg => {
+            expect(msg).to.be.equal("Era 42?");
+        });
+        cy.on("window:alert", msg => {
+            expect(msg).to.be.equal(":D");
+        });
+        cy.get('#prompt').click();
 
     })
 })

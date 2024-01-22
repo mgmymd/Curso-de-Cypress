@@ -56,7 +56,7 @@ describe('Pontos de Atenção', () => {
         const stub2 = cy.stub().as('Alerta!')
         cy.on('window:alert', stub2);
 
-/* Agora, para fazer a checagem após o click e de maneira sincronizada, vamos usar o then() para sincronizar
+/* Para fazer a checagem após o click e de maneira sincronizada, vamos usar o then() para sincronizar
  * validação após o click e usar também o getCall() para conseguir pegar a chamada que foi feita, sendo que
  * podemos ter várias chamadas diferentes, para conseguir a primeira usamos a chamada inicial em 0 como se
  * fosse um array indexado */
