@@ -10,7 +10,7 @@ describe("Uso de iFrames", () => {
 
     it("iFrame I: Deve preencher o campo de texto", () => {
 /* O visit no caso dos iframes acaba ficando dentro do it, pelo fato de */
-        cy.visit("https://wcaquino.me/cypress/componentes.html")
+        cy.visit("https://wcaquino.me/cypress/componentes.html");
 
 /* Nesse caso, o comando mais simples como: cy.get('#frame1').click().type("Teste") não funciona
  * para iframes. Se fizer um get no fram1 ele retorna um id de uma entidade e mais nada. 

@@ -1,13 +1,6 @@
 ///<reference types="Cypress"/>
 
 describe("Uso de iFrames", () => {
-    /* Um iFrame é como se utilizasse uma parte da tela e colocasse uma segunda tela inteira dentro dela
-     * Como exemplo, o site usado nos testes, o trecho inferior de Elemento Externo apresenta uma 
-     * renderização de uma segunda tela inteira, esta é simples e apresenta apenas uma mensagem e sua
-     * caixa de input. Mas poderia ter mais coisa se fosse mais composta.
-     * A forma de se trabalhar com iFrames acaba sendo diferente até para ações básicas, como o de 
-     * realizar um input em uma caixa de texto; */
-    
         it("iFrame II: Deve preencher o campo de texto", () => {
             cy.visit("https://wcaquino.me/cypress/componentes.html")
     
@@ -18,17 +11,10 @@ describe("Uso de iFrames", () => {
      * para conseguir ter acesso a todo o corpo do iframe*/
             cy.get("#frame1").then(iframe =>{
                 const body = iframe.contents().find("body");
-    /* Esse body não está sendo gerenciado pelo cypress, então teremos que usar o wrap para colocar
-     * constante body, e, depois, no navegador procurar o id da caixa de texto que vai receber o input 
-     * para poder encontrar algo cujo id sejá igual aquele valor, como tfield
-     * Por último pode ser usada a assertiva de maneira encadeada, o assert não será um contain,
-     * pelo fato de ser uma caixa de texto que está sendo usada e não um campo de texto normal, sendo 
-     * assim, have.value será utilizado para realizar a verificação/validação */
                 cy.wrap(body).find("#tfield")
                     .type("funciona agora?")
                     .should("have.value", "funciona agora?");
                 cy.wrap(body).find("#otherButton").click();
-    
             })
     /* Contudo, o que foi feito acima acaba sendo um pouco limitado, como exemplo no caso em que clicamos
      * no botão ao lado do input do texto que faz parte do iframe e lança um alert com um OK 
@@ -37,7 +23,16 @@ describe("Uso de iFrames", () => {
      * desejamos que clique e está contido no iframe, como visto na linha 31 para baixo.
      * Novamente, nesse caso do botão, o get não funcionará sozinho, será necessário usar o wrap e o body,
      * para pedir que seja feita a pesquisa pelo ID do botão;
-     * Mas, não será possível executar esse teste, pelo fato de que o cypress não está rastreando */
+     * Uma forma de conseguir monitorar é trazer o iframe para o escopo principal. Podemos inicialmente
+     * testar o escopo externo da url e depois o interno pela url como no teste abaixo.
+     * Por estarmos acessando a url do frame diretamente não vai ser mais necessário usar o body*/
         })
+        it("iFrame II: Deve testar o frame diretamente", () => {
+            cy.visit("https://wcaquino.me/cypress/frame.html");
+
+            cy.get("#otherButton").click();
+            cy.on("window:alert", msg => {
+                expect(msg).to.be.equal("Click OK!");
+            })
     })
-    
+})
