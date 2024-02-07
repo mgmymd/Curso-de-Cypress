@@ -49,6 +49,7 @@ describe("Localizando Elementos", ()=>{
  * Como podemos compor esse caminho? Usamos o nome do elemento seguinte para compor o caminho;
  * Ficando inicialmente algo como: table#tabelaUsuarios tbody
  * Esse espaço entre o tabelaUsuarios e tbody indica que ele é um elemento descendente do tabelaUsuarios;
+ * 
  * Outra maneira de indicar que um elemento é descendente de outro, é usando o > .Contudo, o elemento deve ser um 
  * descendente direto do elemento pai; Nesse caso o body não é um elemento direto do elemento de id tabelaUsuarios, então esse exemplo de
  * montar a busca com o uso de > não vai funcionar;
@@ -59,10 +60,54 @@ describe("Localizando Elementos", ()=>{
  * e depois para conseguir o td, o terceiro td que queremos e não o primeiro, fazemos da seguinte maneira: 
  *          table#tabelaUsuarios tbody>tr td:nth-child(3)>input
  * Podemos depois copiar esse caminho que foi montado e colocar no cy.get para testar se foi feito da maneira correta */
-             cy.get('table#tabelaUsuarios tbody>tr td:nth-child(3)>input');
+             cy.get('table#tabelaUsuarios tbody > tr td:nth-child(3) > input');
+
 /* Mas com essa busca houve um retorno de 5 elementos, não sendo o ideal. Para ajustar ela, podemos inserir que queremos 
- * que o tr seja igual índice 0 para indicar que o desejado era o primeiro botão de Clique aqui, ficando igual o comando abaixo: */
-            cy.get('table#tabelaUsuarios tbody>tr:eq(0) td:nth-child(3)>input');
+ * que o tr seja igual índice 0 para indicar que o desejado era o primeiro botão de Clique aqui, ficando igual o comando abaixo:
+ * O click será para receber o alerta "Francisco" que aparece no cypress */
+            cy.get('table#tabelaUsuarios tbody > tr:eq(0) td:nth-child(3) > input').click()
+
+/* Mas há uma forma mais rápida de chegar neste elemento. Pelo código http, podemos observar que ele
+ * o value "Clique aqui", que pode ir diretamente pelo value usando os colchetes, ficando:
+ *          [value="Clique aqui"]       que retorna 5 valores
+ * 
+ * Melhorando a situação usando outra propriedade, o oncliclk:
+ *          [onclick='alert('Francisco\')']     Mas não é uma boa estratégia se for um código muito grande
+ * após o =, podemos então fazer com que procure uma parte da frase ou uma palavra apenas, colocanod um *
+ * após o onclick:      [onclick*='Francisco']      e com isso vai encontrar apenas 1 valor. Para colocar
+ * agora com um comando do cypress, precisamos colocar um caracter de escape, a barra, para poder 
+ * usar as aspas internas e externas existentes: */
+            cy.get('[onclick*=\'Francisco\']')
+// Ou fazer ainda uso de aspas duplas e depois de aspas simples para que o cypress aceite
+            cy.get("[onclick*='Francisco']")
+
+/* Agora, queremos chegar no primeiro registro da tabela cuja escolaridade seja "Doutorado". Para
+ * isso usa-se a busca por um td que contenha o valor 'Doutorado', ficando:
+            td:contains('Doutorado')        Mas apenas isso não é possível que encontre a linha correta
+ * 
+ * Podemos reduzir o escopo através de tabela, usando o id da tabela, colocando que a table cujo id
+ * seja tabelaUsuarios e tenha o td que contenha o valor Doutorado: table:tabelaUsuario td:contains('Doutorado')
+ * inserido no cypress para ver se é capaz de encontrar;
+ * Também podemos usar apenas o id da tabela, irá funcionar sem a necessidade de indicar table#tabelaUsuarios
+ * ficando: #tabelaUsuarios td:contains('Doutorado'), mas irá retornar 3 valores distintos  */
+            cy.get("table#tabelaUsuarios td:contains('Doutorado')")
+            cy.get("#tabelaUsuarios td:contains('Doutorado')")
+
+// Para reduzir mais o escopo do que será encontrado, podemos pedir que o índice seja igual a zero
+            cy.get("#tabelaUsuarios td:contains('Doutorado'):eq(0)")
+            
+/* Agora, queremos chegar no input desta linha que apresenta pela primeira vez o valor Doutorado de
+ * escolaridade. Assim, queremos chegar em seu irmão. Pelo código http e usando o w3school 
+ * podemos checar qual comando jquery podemos usar: como o ~ para chegar em algum td específico, 
+ * que será o td referente ao input, nesse caso o td 3 e dentro deste td3 queremos seu input */
+            cy.get("#tabelaUsuarios td:contains('Doutorado'):eq(0) ~ td:eq(3) > input")
+
+/* Isso pode ser usado quando não há uma tag, um id específico para ser usado para testes
+ * Podemos também usar outra busca, ao invés de buscar um td que contenha 'Doutorado', vamos pedir que encontre
+ * uma linha tr que tenha Doutorado e o índice seja zero e depois um td igual a 6 e dentro dele o input
+ * Nessa estratégia navegamos até a linha que apresente pela primeira vez o "Doutorado" e depois
+ * nos filhos desta linha vamos até o input */
+            cy.get("#tabelaUsuarios tr:contains('Doutorado'):eq(0) td:eq(6) input")
 
     })
 })
