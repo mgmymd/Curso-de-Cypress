@@ -7,7 +7,11 @@ describe("REFATORADO/SEGUINDO OS VÍDEOS: Instructions and should test at a func
     before(() => {
         cy.visit("https://barrigareact.wcaquino.me");
         cy.login('testeteste@fakegmail.com', '987@SENHA123@');
+    })
+
+    beforeEach(()=>{
         cy.resetar();
+        cy.get(loc.MENU.HOME).click();
     })
 
     it('Cenário 1: Inserir uma nova conta', () =>{
@@ -40,9 +44,16 @@ describe("REFATORADO/SEGUINDO OS VÍDEOS: Instructions and should test at a func
     })
 
     it('Cenário 3: Inserir conta repetida, não deve criar uma conta com o mesmo nome', ()=>{
-// Navegando até a página de contas
+// Preparando o ambiente
         cy.acessarMenuContas();
-// Tentar inserir uma conta nova
+        cy.inserirConta('ALTERADOOOOOOO');
+
+// Navegando até a página de contas
+        cy.wait(4000);
+        cy.get(loc.MENU.HOME);
+        cy.acessarMenuContas();
+    
+// Tentar inserir uma conta nova que tenha o nome de outra já existente
         cy.get(loc.CONTAS.NOME).type('ALTERADOOOOOOO');
         cy.get(loc.CONTAS.BTN_SETTINGS_CONTAS).click();
 // Validar mensagem de erro
@@ -62,17 +73,24 @@ describe("REFATORADO/SEGUINDO OS VÍDEOS: Instructions and should test at a func
 // Validando a existência da nova movimentação na tela após carregar
         cy.get(loc.EXTRATO.LINHAS).should('have.length', 7);
 // Validando com o uso de XPATH
-        cy.xpath(loc.EXTRATO.XPATH_EXTRATO).should('exist');
+        cy.xpath(loc.EXTRATO.XPATH_EXTRATO('AAAAAAAAAAAAAAAAAAAAAA', '123')).should('exist');
     })
 
     it('Cenário 5: Consultar o saldo', ()=>{
         cy.get(loc.MENU.HOME).click();
-
-
-        
+        cy.wait(2000)
+/* Não é interessante amarrar a validação ou consutla de valor por posição,assim é necessário usar o 
+ * XPATH e conferir pela estrutura. */
+        cy.xpath(loc.SALDO.FN_XPATH_SALDO_CONTA('Conta para movimentacoes'))
+                .should('contain', '1.500,00');
     })
 
-    it('Cenário 6', ()=>{
-
+    it('Cenário 6: Remover movimentação', ()=>{
+        cy.get(loc.MENU.EXTRATO).click();
+/* Validando a remoção do extrato usando o XPATH: pelo fato do botão de exclusão não estar no mesmo nível, 
+ * hierarquia do nome "Movimentacao para exlucsao" temos que subir os níveis até chegar no mesmo nível, nesse
+ * caso vamos subir 3 níveis para encontrar o botão de remoção */
+        cy.xpath(loc.EXTRATO.FN_XPATH_REMOVER_ELEMENTO('AAAAAAAAAAAAAAAAAAAAAA')).click();
+        cy.get(loc.MESSAGE).should('have.text', 'Movimentação removida com sucesso!')
     })
 })
