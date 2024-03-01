@@ -1,3 +1,4 @@
+import cypress from 'cypress';
 import loc from './locators'
 
 Cypress.Commands.add('login', (user, psswrd)=>{
@@ -23,3 +24,5 @@ Cypress.Commands.add('inserirConta', conta =>{
     cy.get(loc.CONTAS.NOME).type(conta);
     cy.get(loc.CONTAS.BTN_SETTINGS_CONTAS).click();
 })
+
+
