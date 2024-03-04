@@ -24,5 +24,3 @@ Cypress.Commands.add('inserirConta', conta =>{
     cy.get(loc.CONTAS.NOME).type(conta);
     cy.get(loc.CONTAS.BTN_SETTINGS_CONTAS).click();
 })
-
-

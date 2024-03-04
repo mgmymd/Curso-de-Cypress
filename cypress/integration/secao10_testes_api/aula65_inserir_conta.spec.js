@@ -53,7 +53,7 @@ describe('Seção 10 - Testes API', () =>{
                         senha:"987@SENHA123@"}  })
         .its('body.token').should('not.be.empty')
         .then(token => {
-            cy.request({    url: 'https://barrigarest.wcaquino.me/contas',
+            cy.request({    url: '/contas',
                     method: 'POST',
                     headers: {Authorization: `JWT ${token}`},
                     body:{nome:"aaaaa"},

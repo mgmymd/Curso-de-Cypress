@@ -67,9 +67,8 @@ describe('Testes de serviços Rest com Cypress - getToken e Reset', () =>{
  * de manutenção. Sempre fazemos uma requisição completa, assim, caso seja necessário alterar a URL
  * vamos usar o documento cypress.json e dentro dele, colocar uma propriedade chamada "baseurl" e colocar
  * o caminho principal da URL para que depois seja necessário apenas alterar o valor do recurso, isto é,
- * após a /
- * Não importando mais qual é a base, só o recurso que estamos utilizando */
-
-
+ * após a / . Não importando mais qual é a base, só o recurso que estamos utilizando.
+ * O baseUrl é uma das configurações padrões do cypress que podemos colocar e qualquer alteração dela
+ * é refletido em todos as urls do testes que não forem completas */
     })
 })
