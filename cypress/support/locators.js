@@ -34,7 +34,8 @@ const locators = {
     EXTRATO:{
         LINHAS:'.list-group li',
         XPATH_EXTRATO: (nome, valor) => `"//span[contains(., '${nome}')]/following-sibling::small[contains(., '${valor}')]"`,
-        FN_XPATH_REMOVER_ELEMENTO: nomeConta => `//span[contains(., '${nomeConta}')]/../../..//i[@class='far fa-trash-alt']`
+        FN_XPATH_REMOVER_ELEMENTO: nomeConta => `//span[contains(., '${nomeConta}')]/../../..//i[@class='far fa-trash-alt']`,
+        FN_XPATH_LINHA: desc => `//span[contains(., '${desc}')]/../../../..`
         },
     SALDO:{
     /* Fazer com que o xpath fique dinâmico usando uma função do tipo arrow: que seria parâmetro () e 

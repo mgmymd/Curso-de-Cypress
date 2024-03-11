@@ -27,11 +27,27 @@ describe('Testes mockados do frontend - Gerenciamento de massas', ()=>{
             cy.route({
                 method:'POST',
                  url: '/contas',
-                 response:[{"id":3, "nome":"Conta de teste", "visivel":true, "usuario_id":3}]
-            }).as('salvar conta');
+                 response:[{"id":3, "nome":"Conta de teste", "visivel":true, "usuario_id":3}],
+                 onRequest: req => {
+// Forma de checar se há um nome, não está vazio e se há o token de autorização
+                    expect(req.request.body.nome).to.be.empty
+                    expect(req.request.headers).to.have.property('Authorization')
+                 }      }).as('saveConta');
+
+/* Também podemos fazer um stub em vez de usar um onRequest e o expect para verificar se
+ * as requisições estão sendo feitas da forma correta, não é indicado para fazer em todos
+ * os momentos mas para algumas será necessário. Ficando:
+ * 
+    cy.wait('@saveConta').then(()=>{
+        console.log(reqStub.args[0][0])
+        expect(reqStub.args[0][0].request.body.nome).to.be.empty
+        expect(reqStub.args[0][0].request.headers).to.have.property('Authorization')
+    }) 
+*/
+
 
     // Clicar para seguir até a página de contas
-        cy.wait(4000);
+        cy.wait(2000);
         cy.acessarMenuContas();
 
     // Redefinindo para que possa ser apresentado na interface gráfica a presença desta terceira conta:
@@ -41,13 +57,13 @@ describe('Testes mockados do frontend - Gerenciamento de massas', ()=>{
             response:[{"id": 1, "nome": "Carteira",  "visivel": true, "usuario_id": 1},
                     {"id": 2, "nome": "Banco", "visivel": true, "usuario_id": 2},
                 {"id": 3, "nome": "Conta de teste", "visivel": true, "usuario_id": 3}]
-            }).as('contasSave');
+            }).as('saveConta');
 
     // Inserir uma nova conta
-        cy.inserirConta('Conta de teste');
+        cy.inserirConta('{CONTROL}');
 
     // Validar a inserção correta da conta
-        cy.get(loc.MESSAGE).should('contain', 'Conta inserida com sucesso!');
+        cy.get(loc.MESSAGE).should('contain', 'sucesso');
     })
 
     it('Cenário 2: Alterar conta', () =>{
@@ -169,22 +185,66 @@ describe('Testes mockados do frontend - Gerenciamento de massas', ()=>{
         cy.xpath(loc.EXTRATO.XPATH_EXTRATO('AAAAAAAAAAAAAAAAAAAAAA', '123')).should('exist');
     })
 
-    it.only('Cenário 5: Consultar o saldo', ()=>{
+    it('Cenário 5: Consultar o saldo', ()=>{
+/* Trocamos inicialmente a conta que queremos buscar e seu calor para Carteira com mil;
+ *         cy.xpath(loc.SALDO.FN_XPATH_SALDO_CONTA('Carteira'))
+                .should('contain', '1.000,00');
+ * Depois fazemos um get para transações, pegamos só uma e usamos para criar uma rota antes de
+ * utilizar o cy.xpath.
+ *  No cy.route, na parte de url, usamos um '/transacoes/**' para que o id não seja um problema,
+ * tendo em vista que o id é alterado cada ação que é feita */
+        cy.route({
+            method:'GET',
+            url: '/transacoes/**',
+            response:{  "conta": "Conta para saldo", "id": 1927823,
+                "descricao": "Movimentacao 1, calculo saldo",
+                "envolvido": "CCC", "observacao": null, "tipo": "REC", 
+                "data_transacao": "2024-03-07T03:00:00.000Z",
+                "data_pagamento": "2024-03-07T03:00:00.000Z", "valor": "3500.00", 
+                "status": false, "conta_id": 2056539, "usuario_id": 47637,
+                "transferencia_id": null, "parcelamento_id": null    }
+        });
+
+        cy.route({
+            method:'PUT',
+            url: '/transacoes/**',
+            response:{  "conta": "Conta para saldo", "id": 1927823,
+                "descricao": "Movimentacao 1, calculo saldo",
+                "envolvido": "CCC", "observacao": null, "tipo": "REC", 
+                "data_transacao": "2024-03-07T03:00:00.000Z",
+                "data_pagamento": "2024-03-07T03:00:00.000Z", "valor": "3500.00", 
+                "status": false, "conta_id": 2056539, "usuario_id": 47637,
+                "transferencia_id": null, "parcelamento_id": null    }
+        });
+
+        cy.route({
+            method: 'GET',
+            url: '/saldo',
+            response:[{  "conta_id": 666, "conta": "Carteira", "saldo": "4034" },
+                    {"conta_id": 999, "conta": "Banco","saldo": "1000000000000000000"   }
+            ]}).as('saldo')
+
         cy.get(loc.MENU.HOME).click();
         cy.wait(2000)
-/* */
 
-
-        cy.xpath(loc.SALDO.FN_XPATH_SALDO_CONTA('Conta para movimentacoes'))
-                .should('contain', '1.500,00');
+        cy.xpath(loc.SALDO.FN_XPATH_SALDO_CONTA('Carteira')).should('contain', '1.000,00');
     })
 
     it('Cenário 6: Remover movimentação', ()=>{
+/* Sabemos que o DELETE, o status code é 404 e não veio nada no response, e já sabemos que não
+ * é enviado mais nada em retorno com o 404. Podemos criar uma rota com ele,  */
+        cy.server()
+        cy.route({
+            method:'DELETE',
+            url:'/transacoes/**',
+            status:412,
+            response:{},
+            status:204
+        }).as('deletado')
+
+
         cy.get(loc.MENU.EXTRATO).click();
-/*  */
-
-
-        cy.xpath(loc.EXTRATO.FN_XPATH_REMOVER_ELEMENTO('AAAAAAAAAAAAAAAAAAAAAA')).click();
+        cy.xpath(loc.EXTRATO.FN_XPATH_REMOVER_ELEMENTO('Movimentacao para exclusao')).click();
         cy.get(loc.MESSAGE).should('have.text', 'Movimentação removida com sucesso!')
     })
 })
