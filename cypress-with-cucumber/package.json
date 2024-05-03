@@ -11,6 +11,12 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "cypress": "^13.8.1"
+    "@badeball/cypress-cucumber-preprocessor": "^20.0.4",
+    "@bahmutov/cypress-esbuild-preprocessor": "^2.2.0",
+    "cypress": "^13.8.1",
+    "ts-loader": "^9.5.1"
+  },
+  "cypress-cucumber-preprocessor": {
+    "stepDefinitions": "cypress-with-cucumber/cypress/support/step_definitions/**/*.js"
   }
 }

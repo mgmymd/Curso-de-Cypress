@@ -14,3 +14,7 @@ build/
 cypress/screenshots/
 cypress/videos/
 cypress/results/
+
+# Classes notes
+.pdf
+*.pdf
